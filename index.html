@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amazon FBA Profit Calculator</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #F3F3F3;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+    }
+    .container {
+        background: #fff;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        width: 100%;
+        max-width: 480px;
+    }
+    h1 {
+        text-align: center;
+        color: #FF9900;
+        margin-bottom: 20px;
+    }
+    .input-group {
+        margin-bottom: 15px;
+    }
+    label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #232F3E;
+    }
+    input, select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 16px;
+    }
+    button {
+        width: 100%;
+        background-color: #FF9900;
+        color: #232F3E;
+        padding: 12px;
+        border: none;
+        border-radius: 8px;
+        font-size: 18px;
+        cursor: pointer;
+        font-weight: bold;
+        margin-top: 10px;
+    }
+    button:hover {
+        background-color: #e68a00;
+    }
+    .result {
+        margin-top: 20px;
+        padding: 15px;
+        background-color: #232F3E;
+        color: #fff;
+        border-radius: 8px;
+        text-align: center;
+        font-size: 18px;
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>Amazon FBA Calculator</h1>
+
+    <div class="input-group">
+        <label for="currency">Currency</label>
+        <select id="currency">
+            <option value="$">USD ($)</option>
+            <option value="€">EUR (€)</option>
+            <option value="£">GBP (£)</option>
+        </select>
+    </div>
+
+    <div class="input-group">
+        <label for="units">Units</label>
+        <input type="number" id="units" placeholder="Enter number of units" value="1">
+    </div>
+
+    <div class="input-group">
+        <label for="buyCost">Product Buy Cost (per unit)</label>
+        <input type="number" id="buyCost" placeholder="Enter buy cost">
+    </div>
+    <div class="input-group">
+        <label for="shipCost">Shipping Cost (per unit)</label>
+        <input type="number" id="shipCost" placeholder="Enter shipping cost">
+    </div>
+    <div class="input-group">
+        <label for="amazonFee">Amazon Fees (per unit)</label>
+        <input type="number" id="amazonFee" placeholder="Enter Amazon fees">
+    </div>
+    <div class="input-group">
+        <label for="otherCost">Other Fees (per unit)</label>
+        <input type="number" id="otherCost" placeholder="Enter other fees">
+    </div>
+    <div class="input-group">
+        <label for="sellPrice">Selling Price (per unit)</label>
+        <input type="number" id="sellPrice" placeholder="Enter selling price">
+    </div>
+
+    <button onclick="calculateProfit()">Calculate Profit</button>
+    <button onclick="downloadPDF()">Download PDF Report</button>
+
+    <div class="result" id="result">
+        Profit: $0.00<br>
+        Margin: 0% | ROI: 0%
+    </div>
+</div>
+
+<script>
+function calculateProfit() {
+    const currency = document.getElementById('currency').value;
+    const units = parseInt(document.getElementById('units').value) || 1;
+    const buyCost = parseFloat(document.getElementById('buyCost').value) || 0;
+    const shipCost = parseFloat(document.getElementById('shipCost').value) || 0;
+    const amazonFee = parseFloat(document.getElementById('amazonFee').value) || 0;
+    const otherCost = parseFloat(document.getElementById('otherCost').value) || 0;
+    const sellPrice = parseFloat(document.getElementById('sellPrice').value) || 0;
+
+    const costPerUnit = buyCost + shipCost + amazonFee + otherCost;
+    const totalCost = costPerUnit * units;
+    const revenue = sellPrice * units;
+    const totalProfit = revenue - totalCost;
+
+    const margin = revenue > 0 ? (totalProfit / revenue) * 100 : 0;
+    const roi = totalCost > 0 ? (totalProfit / totalCost) * 100 : 0;
+
+    document.getElementById('result').innerHTML = `
+        <b>Per Unit:</b> ${currency}${(sellPrice - costPerUnit).toFixed(2)} profit<br>
+        <b>Total (${units} units):</b> ${currency}${totalProfit.toFixed(2)}<br>
+        Margin: ${margin.toFixed(2)}% | ROI: ${roi.toFixed(2)}%
+    `;
+}
+
+function downloadPDF() {
+    const currency = document.getElementById('currency').value;
+    const resultText = document.getElementById('result').innerText;
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    doc.setFontSize(16);
+    doc.text("Amazon FBA Profit Report", 20, 20);
+    doc.setFontSize(12);
+    doc.text(resultText, 20, 40);
+    doc.save("FBA_Profit_Report.pdf");
+}
+
+// Load jsPDF for PDF export
+const script = document.createElement('script');
+script.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+document.head.appendChild(script);
+</script>
+</body>
+</html>
